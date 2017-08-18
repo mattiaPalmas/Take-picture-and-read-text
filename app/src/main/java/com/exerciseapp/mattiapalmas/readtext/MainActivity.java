@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +24,7 @@ import android.widget.TextView;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -38,13 +40,14 @@ public class MainActivity extends Activity {
     Button buttonCamera;
     private TessBaseAPI mTess;
     String dataPath;
+    Bitmap imgBitmap;
     static final int CAM_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         image = BitmapFactory.decodeResource(getResources(), R.drawable.ccc);
         buttonCamera = (Button) findViewById(R.id.cameraButton);
         imageView = (ImageView)findViewById(R.id.imageView);
@@ -89,26 +92,28 @@ public class MainActivity extends Activity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             imageView.setImageBitmap(imageBitmap);
+            imgBitmap = imageBitmap;
+
+
         }
     }
+
+
+
+
     public void processImage(View view) {
 
         //initialize Tesseract API
         String language = "eng";
-        Uri path = Uri.parse(imageView.getResources().toString());
-        String imgPath = path.toString();
-        dataPath = imgPath;
+        dataPath = getFilesDir()+ "/tesseract/";
         mTess = new TessBaseAPI();
-
-        //make sure training data has been copied
-        checkFile(new File(dataPath));
 
         checkFile(new File(dataPath + "tessdata/"));
 
         mTess.init(dataPath, language);
 
         String OCRresult = null;
-        mTess.setImage(image);
+        mTess.setImage(imgBitmap);
         OCRresult = mTess.getUTF8Text();
         TextView OCRTextView = (TextView) findViewById(R.id.OCRTextView);
         OCRTextView.setText(OCRresult);
