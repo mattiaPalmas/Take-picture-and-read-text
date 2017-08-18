@@ -13,5 +13,7 @@ App that let you take  a picture and read the text.
 **tools**
 
 -Android studio
+---
 -Using phone camera
+---
 -Library tesseract
